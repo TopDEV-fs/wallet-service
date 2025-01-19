@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wallet-service-config
+  namespace: fintech
+data:
+  application.yml: |
+    spring:
+      application:
+        name: wallet-service
+      config:
+        import: optional:configserver:http://config-service:8889
+      datasource:
+        driver-class-name: org.postgresql.Driver
+      jpa:
+        hibernate:
+          ddl-auto: update
+        database-platform: org.hibernate.dialect.PostgreSQLDialect
+      kafka:
+        producer:
+          bootstrap-servers: 10.0.0.26:9092
+          key-serializer: org.apache.kafka.common.serialization.StringSerializer
+          value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+    user-service:
+      url: http://user-service:8090/api/users
+
+    management:
+      endpoints:
+        web:
+          exposure:
+            include: health,info,metrics,prometheus
+      endpoint:
+        health:
+          show-details: when-authorized
+          probes:
+            enabled: true
